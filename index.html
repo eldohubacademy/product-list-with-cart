@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Product List</title>
+  </head>
+  <body>
+    <main>
+      <h1>Desserts</h1>
+      <div class="products-container" id="products-container"></div>
+    </main>
+    <div class="cart">
+      <h2>Your Cart <span id="cart-count">2</span></h2>
+      <div class="cart-container" id="cart-container"></div>
+    </div>
+  </body>
+  <script>
+    const productsContainer = document.getElementById("products-container");
+    const cart = [];
+    fetch("data.json")
+      .then((uji) => uji.json())
+      .then((products) => {
+        console.log(products);
+        showProducts(products);
+      });
+
+    function showProducts(productsArray) {
+      // loop through array - create html for each item in the array
+      productsArray.forEach((product) => {
+        const div = document.createElement("div");
+        div.classList.add("product");
+        div.innerHTML = `
+            <img src="${product.image.desktop}"  />
+            <button class="add-to-cart" data-name="${product.name}" > Add to Cart </button>
+            <div class="control-cart" data-name="${product.name}"> 
+              <button class="decrease">-</button>
+              <span class="item-count">1</span>
+              <button class="increase">+</button>
+            </div>
+            <p> ${product.category} </p>
+            <h3> ${product.name} </h3>
+            <p class="price">KES ${product.price} </p>
+        `;
+        productsContainer.append(div);
+      });
+      // add item to cart
+      document.querySelectorAll(".add-to-cart").forEach((btn) => {
+        console.log(btn);
+        btn.addEventListener("click", (e) => {
+          let itemName = e.target.getAttribute("data-name");
+          let itemInfo = productsArray.find((p) => p.name == itemName);
+          let cartItem = cart.find((item) => item.name == itemName);
+          if (cartItem) {
+            cartItem.count = cartItem.count + 1;
+          } else {
+            itemInfo.count = 1;
+            cart.push(itemInfo);
+          }
+          console.log(cart);
+          showCart(cart);
+          e.target.nextElementSibling.style.display = "block";
+          e.target.style.display = "none";
+        });
+      });
+    }
+
+    function showCart(itemsArray) {
+      //
+    }
+  </script>
+  <style>
+    .control-cart {
+      display: none;
+    }
+    body {
+      display: flex;
+    }
+    body > main {
+      flex: 3;
+      padding: 18px;
+    }
+    body > div {
+      flex: 1;
+    }
+    .products-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .products-container > div {
+      width: 30%;
+    }
+    .products-container img {
+      width: 100%;
+    }
+  </style>
+</html>

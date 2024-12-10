@@ -17,7 +17,9 @@
   </body>
   <script>
     const productsContainer = document.getElementById("products-container");
-    const cart = [];
+    const cartContainer = document.getElementById("cart-container");
+    let cart = [];
+
     fetch("data.json")
       .then((uji) => uji.json())
       .then((products) => {
@@ -63,13 +65,67 @@
           e.target.style.display = "none";
         });
       });
+      // increase item count
+      document.querySelectorAll(".increase").forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+          let itemName = event.target.parentElement.getAttribute("data-name");
+          let cartItem = cart.find((item) => item.name == itemName);
+          cartItem.count = cartItem.count + 1;
+          showCart(cart);
+          event.target.previousElementSibling.textContent = cartItem.count;
+        });
+      });
+      //  decrease item count
+      
     }
-
+    // functional programming principles -- side effects
+    // store data on locaStorage/browser -- cart
     function showCart(itemsArray) {
-      //
+      // clean container --- create divs for each cart item
+      cartContainer.innerHTML = "";
+      itemsArray.forEach((item) => {
+        const div = document.createElement("div");
+        div.classList.add("cart-item");
+        div.innerHTML = `
+            <div>
+              <h3> ${item.name} </h3>
+              <p> <span class="cart-item-count">${item.count}x</span> 
+                  <span class="cart-item-price">@KES.${item.price}</span> 
+                  <span class="cart-item-total"> KES.${
+                    item.count * item.price
+                  }</span>
+              </p>
+            </div>
+            <button class="remove-item" data-name="${item.name}" > X </button>
+        `;
+        cartContainer.append(div);
+      });
+      document.querySelectorAll(".remove-item").forEach((btn) => {
+        btn.addEventListener("click", (event) => {
+          console.log("clicked!!");
+          let itemName = event.target.getAttribute("data-name");
+          const newCart = cart.filter((item) => item.name !== itemName); // remove the clicked cart item
+          cart = newCart;
+          showCart(cart);
+        });
+      });
     }
   </script>
   <style>
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      font-size: 10px;
+    }
+    .cart-item-count {
+      color: orange;
+      margin-right: 20px;
+    }
+    .cart-item-total {
+      font-weight: bold;
+    }
     .control-cart {
       display: none;
     }
